@@ -296,13 +296,21 @@
 
         /* Responsive */
         @media (max-width: 1024px) {
+            html, body {
+                overflow: auto;
+                height: auto;
+            }
+
             .container {
                 grid-template-columns: 1fr;
-                grid-template-rows: 50vh 1fr;
+                grid-template-rows: 50vh auto;
+                height: auto;
+                min-height: 100vh;
             }
 
             .content-panel {
                 padding: 32px;
+                overflow: visible;
             }
 
             .headline {
@@ -311,6 +319,10 @@
         }
 
         @media (max-width: 640px) {
+            .container {
+                grid-template-rows: 40vh auto;
+            }
+
             .content-panel {
                 padding: 24px;
             }
