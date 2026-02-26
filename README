@@ -1,1 +1,45 @@
-THIS IS ZABATNI
+Zabatni — Claude Code README
+Project Overview
+Zabatni is a single-page matchmaking website targeting Cairo's A+ demographic. The core concept is a live population visualization that responds to user filters — users watch a crowd narrow down to their compatible matches before submitting their own profile.
+Visual Reference
+The attached screenshot ("The Curator") captures the exact layout direction. Use it as the primary design reference with the following adaptations:
+
+Single page, no subpages, no navigation links
+Remove all "invitation only" / "apply for membership" language
+Brand name is Zabatni — replace "The Curator" throughout
+Keep the split-panel layout: visualization left, content right
+Keep the bottom status bar showing active pool count
+Keep the coordinates footer detail (Cairo: 30.0444° N, 31.2357° E)
+
+The Visualization Panel (Left)
+This is the most important element. It is a dense grid of small dot/circle figures representing the eligible population of Greater Cairo and Giza (~20 million combined). As filters are applied, dots grey out, leaving only the matching colored dots visible. Key behaviors:
+
+All dots start active (warm accent color)
+Greyed dots remain visible to preserve sense of total pool size
+The transition should animate smoothly when filters change
+The active pool counter at the bottom updates in real time
+Dots should be small and dense enough to feel like a data visualization, not decorative
+
+The Filter Panel (Right)
+Replaces the static copy from the reference. Contains:
+
+A short headline and one-line descriptor
+The 7 filter controls (Gender, Age, Religion, Religiosity, Marital Status, Education, Neighborhood)
+A primary CTA button: "Find My Match"
+A secondary line: "Submit your profile to get matched"
+
+Filters & Population Logic
+Each filter reduces the active pool count. Base pool is the eligible Greater Cairo and Giza population. The primary target neighborhoods are Tagamoa (New Cairo) and Sheikh Zayed — these should appear as default or top-listed options in the neighborhood filter. Approximate weight of each filter is documented in zabatni_filter_data.md — use those percentages to calculate the pool reduction logic.
+Tech Stack
+
+Plain HTML, CSS, vanilla JavaScript — no frameworks, no build tools
+Single .html file
+The dot grid should be rendered on a <canvas> element for performance
+
+Tone & Design
+
+Premium, warm, minimal — not a dating app, a matchmaking platform
+Color palette: off-white/cream background on the right panel, muted teal/sage grid background on the left (per reference), warm gold or amber as the accent for active dots
+Typography: serif display font for headlines, clean sans for UI elements
+No hearts, no pink, nothing that reads as casual or playful
+

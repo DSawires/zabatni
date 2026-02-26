@@ -1,1 +1,747 @@
-Welcome
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zabatni — Cairo's Matchmaking Platform</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-cream: #FAF8F5;
+            --bg-sage: #E8EDEA;
+            --accent-gold: #C9A962;
+            --accent-amber: #D4A853;
+            --text-dark: #2C3E3B;
+            --text-muted: #6B7D79;
+            --dot-inactive: #B8C4C0;
+            --dot-active: #C9A962;
+            --border-light: #D4DCD8;
+        }
+
+        html, body {
+            height: 100%;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-cream);
+            color: var(--text-dark);
+            overflow: hidden;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            height: 100vh;
+        }
+
+        /* Left Panel - Visualization */
+        .viz-panel {
+            background: var(--bg-sage);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .viz-header {
+            padding: 24px 32px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 20px;
+            font-weight: 500;
+            color: var(--text-dark);
+            letter-spacing: 0.5px;
+        }
+
+        .logo-icon {
+            width: 28px;
+            height: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-icon svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .canvas-container {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #dotCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .explore-label {
+            position: absolute;
+            bottom: 60px;
+            left: 32px;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .explore-label::before {
+            content: '';
+            width: 6px;
+            height: 6px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+        }
+
+        .viz-footer {
+            height: 48px;
+            background: rgba(44, 62, 59, 0.95);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            color: #fff;
+        }
+
+        .pool-counter {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .pool-count {
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 14px;
+            letter-spacing: 0;
+            color: var(--accent-gold);
+        }
+
+        .scroll-hint {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            opacity: 0.6;
+        }
+
+        .coordinates {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            opacity: 0.8;
+        }
+
+        .coordinates span {
+            opacity: 0.5;
+            margin-left: 8px;
+            font-size: 9px;
+        }
+
+        /* Right Panel - Content */
+        .content-panel {
+            background: var(--bg-cream);
+            display: flex;
+            flex-direction: column;
+            padding: 48px 64px;
+            overflow-y: auto;
+        }
+
+        .content-header {
+            margin-bottom: 48px;
+        }
+
+        .headline {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 48px;
+            font-weight: 400;
+            line-height: 1.1;
+            margin-bottom: 16px;
+            color: var(--text-dark);
+        }
+
+        .headline em {
+            font-style: italic;
+            color: var(--text-muted);
+        }
+
+        .tagline {
+            font-size: 15px;
+            color: var(--text-muted);
+            line-height: 1.6;
+            max-width: 380px;
+        }
+
+        .filters-section {
+            flex: 1;
+        }
+
+        .filter-group {
+            margin-bottom: 24px;
+        }
+
+        .filter-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .filter-select {
+            width: 100%;
+            padding: 14px 16px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            color: var(--text-dark);
+            background: #fff;
+            border: 1px solid var(--border-light);
+            border-radius: 6px;
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236B7D79' d='M2 4l4 4 4-4'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 16px center;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .filter-select:hover {
+            border-color: var(--text-muted);
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--accent-gold);
+            box-shadow: 0 0 0 3px rgba(201, 169, 98, 0.1);
+        }
+
+        .filter-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .cta-section {
+            margin-top: 32px;
+            padding-top: 32px;
+            border-top: 1px solid var(--border-light);
+        }
+
+        .cta-button {
+            width: 100%;
+            padding: 18px 32px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: #fff;
+            background: var(--text-dark);
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .cta-button:hover {
+            background: #1a2a27;
+            transform: translateY(-1px);
+        }
+
+        .cta-button svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .cta-subtext {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .cta-subtext a {
+            color: var(--text-dark);
+            text-decoration: underline;
+            text-underline-offset: 3px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+                grid-template-rows: 50vh 1fr;
+            }
+
+            .content-panel {
+                padding: 32px;
+            }
+
+            .headline {
+                font-size: 36px;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .content-panel {
+                padding: 24px;
+            }
+
+            .headline {
+                font-size: 28px;
+            }
+
+            .filter-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Left Panel - Visualization -->
+        <div class="viz-panel">
+            <div class="viz-header">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <svg viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="16" cy="16" r="14" stroke="#2C3E3B" stroke-width="1.5"/>
+                            <circle cx="16" cy="16" r="6" fill="#C9A962"/>
+                            <circle cx="16" cy="6" r="2" fill="#2C3E3B"/>
+                            <circle cx="16" cy="26" r="2" fill="#2C3E3B"/>
+                            <circle cx="6" cy="16" r="2" fill="#2C3E3B"/>
+                            <circle cx="26" cy="16" r="2" fill="#2C3E3B"/>
+                        </svg>
+                    </div>
+                    Zabatni
+                </div>
+            </div>
+
+            <div class="canvas-container">
+                <canvas id="dotCanvas"></canvas>
+            </div>
+
+            <div class="explore-label">Explore the pool</div>
+
+            <div class="viz-footer">
+                <div class="pool-counter">
+                    Active Pool <span class="pool-count" id="poolCount">20,000,000</span>
+                </div>
+                <div class="scroll-hint">Adjust filters to refine</div>
+                <div class="coordinates">
+                    Cairo, EG <span>30.0444° N, 31.2357° E</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Panel - Content -->
+        <div class="content-panel">
+            <div class="content-header">
+                <h1 class="headline">Curated<br><em>Connections</em></h1>
+                <p class="tagline">Cairo's definitive registry for the accomplished. Where compatibility is calculated, not left to chance.</p>
+            </div>
+
+            <div class="filters-section">
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label class="filter-label">Gender</label>
+                        <select class="filter-select" id="filterGender" data-filter="gender">
+                            <option value="all">All Genders</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">Age Range</label>
+                        <select class="filter-select" id="filterAge" data-filter="age">
+                            <option value="all">All Ages</option>
+                            <option value="marriageable">Marriageable (18-55)</option>
+                            <option value="18-24">18-24</option>
+                            <option value="25-29">25-29</option>
+                            <option value="30-34">30-34</option>
+                            <option value="35-39">35-39</option>
+                            <option value="40-44">40-44</option>
+                            <option value="45-55">45-55</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label class="filter-label">Religion</label>
+                        <select class="filter-select" id="filterReligion" data-filter="religion">
+                            <option value="all">All Religions</option>
+                            <option value="muslim">Muslim</option>
+                            <option value="christian">Christian (Coptic)</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">Marital Status</label>
+                        <select class="filter-select" id="filterMarital" data-filter="marital">
+                            <option value="all">All Statuses</option>
+                            <option value="never">Never Married</option>
+                            <option value="married">Married</option>
+                            <option value="divorced">Divorced</option>
+                            <option value="divorced-children">Divorced with Children</option>
+                            <option value="widowed">Widowed</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="filter-row">
+                    <div class="filter-group">
+                        <label class="filter-label">Education</label>
+                        <select class="filter-select" id="filterEducation" data-filter="education">
+                            <option value="all">All Education Levels</option>
+                            <option value="educated">Secondary & Above</option>
+                            <option value="university">University & Higher</option>
+                            <option value="post-secondary">Post-Secondary Diploma</option>
+                            <option value="secondary">Secondary / Technical</option>
+                            <option value="preparatory">Preparatory</option>
+                        </select>
+                    </div>
+
+                    <div class="filter-group">
+                        <label class="filter-label">Neighborhood</label>
+                        <select class="filter-select" id="filterNeighborhood" data-filter="neighborhood">
+                            <option value="all">All Neighborhoods</option>
+                            <option value="tagamoa">Tagamoa / New Cairo</option>
+                            <option value="sheikh-zayed">Sheikh Zayed / Compound Zone</option>
+                            <option value="new-cairo">New Cairo / 5th Settlement</option>
+                            <option value="rehab">Rehab / Madinaty</option>
+                            <option value="6october">6th of October City</option>
+                            <option value="heliopolis">Heliopolis / Nasr City</option>
+                            <option value="maadi">Maadi</option>
+                            <option value="zamalek">Zamalek</option>
+                            <option value="dokki">Dokki / Mohandessin</option>
+                            <option value="downtown">Downtown / Garden City</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="cta-section">
+                    <button class="cta-button" id="ctaButton">
+                        Find My Match
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"/>
+                        </svg>
+                    </button>
+                    <p class="cta-subtext">Submit your profile to get matched</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Population data based on CAPMAS Egypt 2025
+        const BASE_POPULATION = 20000000; // Greater Cairo + Giza combined eligible pool
+
+        // Filter percentages (from zabatni_filter_data.md)
+        const FILTER_DATA = {
+            gender: {
+                all: 1,
+                male: 0.515,
+                female: 0.485
+            },
+            age: {
+                all: 1,
+                'marriageable': 0.47, // 18-55 only (~47% of total pop)
+                '18-24': 0.084,
+                '25-29': 0.080,
+                '30-34': 0.074,
+                '35-39': 0.070,
+                '40-44': 0.064,
+                '45-55': 0.097
+            },
+            religion: {
+                all: 1,
+                muslim: 0.90,
+                christian: 0.10
+            },
+            marital: {
+                all: 1,
+                never: 0.303,
+                married: 0.593,
+                divorced: 0.018,
+                'divorced-children': 0.006,
+                widowed: 0.073
+            },
+            education: {
+                all: 1,
+                'educated': 0.58, // A+ segment: University + post-secondary + secondary
+                university: 0.248,
+                'post-secondary': 0.055,
+                secondary: 0.277,
+                preparatory: 0.164
+            },
+            neighborhood: {
+                all: 1,
+                tagamoa: 0.02,
+                'sheikh-zayed': 0.025,
+                'new-cairo': 0.04,
+                rehab: 0.01,
+                '6october': 0.03,
+                heliopolis: 0.035,
+                maadi: 0.0125,
+                zamalek: 0.00625,
+                dokki: 0.0225,
+                downtown: 0.0125
+            }
+        };
+
+        // Canvas setup
+        const canvas = document.getElementById('dotCanvas');
+        const ctx = canvas.getContext('2d');
+        let dots = [];
+        let animationId = null;
+        let targetActiveCount = 0;
+
+        // Dot configuration
+        const DOT_SIZE = 6;
+        const DOT_SPACING = 14;
+        const PADDING = 32;
+        const ACTIVE_COLOR = '#C9A962';
+        const INACTIVE_COLOR = '#B8C4C0';
+
+        let COLS, ROWS, TOTAL_DOTS;
+
+        function resizeCanvas() {
+            const container = canvas.parentElement;
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = container.clientWidth * dpr;
+            canvas.height = container.clientHeight * dpr;
+            canvas.style.width = container.clientWidth + 'px';
+            canvas.style.height = container.clientHeight + 'px';
+            ctx.scale(dpr, dpr);
+
+            // Calculate grid dimensions based on available space
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+            COLS = Math.floor((width - PADDING * 2) / DOT_SPACING) + 1;
+            ROWS = Math.floor((height - PADDING * 2) / DOT_SPACING) + 1;
+            TOTAL_DOTS = COLS * ROWS;
+
+            initDots();
+        }
+
+        function getGridLayout() {
+            const container = canvas.parentElement;
+            const width = container.clientWidth;
+            const height = container.clientHeight;
+
+            const gridWidth = (COLS - 1) * DOT_SPACING;
+            const gridHeight = (ROWS - 1) * DOT_SPACING;
+
+            // Center the grid
+            const offsetX = (width - gridWidth) / 2;
+            const offsetY = (height - gridHeight) / 2;
+
+            return { offsetX, offsetY, spacing: DOT_SPACING, width, height };
+        }
+
+        function initDots() {
+            const { offsetX, offsetY, spacing } = getGridLayout();
+
+            dots = [];
+            for (let i = 0; i < TOTAL_DOTS; i++) {
+                const row = Math.floor(i / COLS);
+                const col = i % COLS;
+                const x = offsetX + col * spacing;
+                const y = offsetY + row * spacing;
+
+                dots.push({
+                    id: i,
+                    currentX: x,
+                    currentY: y,
+                    targetX: x,
+                    targetY: y,
+                    active: true
+                });
+            }
+
+            drawDots();
+        }
+
+        function calculateTargetPositions(activeCount) {
+            const { offsetX, offsetY, spacing } = getGridLayout();
+
+            // Sort dots: active ones get top positions
+            // Active dots fill from top-left, inactive fill remaining spots below
+            for (let i = 0; i < TOTAL_DOTS; i++) {
+                const row = Math.floor(i / COLS);
+                const col = i % COLS;
+
+                dots[i].targetX = offsetX + col * spacing;
+                dots[i].targetY = offsetY + row * spacing;
+                dots[i].active = i < activeCount;
+            }
+        }
+
+        function drawDots() {
+            const container = canvas.parentElement;
+            ctx.clearRect(0, 0, container.clientWidth, container.clientHeight);
+
+            // Draw inactive dots first (behind)
+            dots.forEach(dot => {
+                if (!dot.active) {
+                    ctx.fillStyle = INACTIVE_COLOR;
+                    ctx.beginPath();
+                    ctx.arc(dot.currentX, dot.currentY, DOT_SIZE / 2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
+
+            // Draw active dots on top
+            dots.forEach(dot => {
+                if (dot.active) {
+                    ctx.fillStyle = ACTIVE_COLOR;
+                    ctx.beginPath();
+                    ctx.arc(dot.currentX, dot.currentY, DOT_SIZE / 2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
+        }
+
+        function animateDots() {
+            const speed = 0.15;
+            let needsUpdate = false;
+
+            dots.forEach(dot => {
+                const dx = dot.targetX - dot.currentX;
+                const dy = dot.targetY - dot.currentY;
+
+                if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) {
+                    dot.currentX += dx * speed;
+                    dot.currentY += dy * speed;
+                    needsUpdate = true;
+                } else {
+                    dot.currentX = dot.targetX;
+                    dot.currentY = dot.targetY;
+                }
+            });
+
+            drawDots();
+
+            if (needsUpdate) {
+                animationId = requestAnimationFrame(animateDots);
+            } else {
+                animationId = null;
+            }
+        }
+
+        function calculatePool() {
+            let multiplier = 1;
+
+            // Get all filter values
+            const gender = document.getElementById('filterGender').value;
+            const age = document.getElementById('filterAge').value;
+            const religion = document.getElementById('filterReligion').value;
+            const marital = document.getElementById('filterMarital').value;
+            const education = document.getElementById('filterEducation').value;
+            const neighborhood = document.getElementById('filterNeighborhood').value;
+
+            // Apply each filter
+            multiplier *= FILTER_DATA.gender[gender];
+            multiplier *= FILTER_DATA.age[age];
+            multiplier *= FILTER_DATA.religion[religion];
+            multiplier *= FILTER_DATA.marital[marital];
+            multiplier *= FILTER_DATA.education[education];
+            multiplier *= FILTER_DATA.neighborhood[neighborhood];
+
+            return Math.round(BASE_POPULATION * multiplier);
+        }
+
+        function updateVisualization() {
+            const poolSize = calculatePool();
+
+            // Update counter with animation
+            const counter = document.getElementById('poolCount');
+            const currentValue = parseInt(counter.textContent.replace(/,/g, ''));
+            animateCounter(counter, currentValue, poolSize);
+
+            // Calculate active dots as proportion of total
+            const ratio = poolSize / BASE_POPULATION;
+            const activeCount = Math.max(1, Math.round(TOTAL_DOTS * ratio));
+            targetActiveCount = activeCount;
+
+            // Update dot positions - active dots grouped at top
+            calculateTargetPositions(activeCount);
+
+            if (!animationId) {
+                animationId = requestAnimationFrame(animateDots);
+            }
+        }
+
+        function animateCounter(element, from, to) {
+            const duration = 500;
+            const start = performance.now();
+
+            function update(currentTime) {
+                const elapsed = currentTime - start;
+                const progress = Math.min(elapsed / duration, 1);
+
+                // Ease out cubic
+                const easeProgress = 1 - Math.pow(1 - progress, 3);
+                const current = Math.round(from + (to - from) * easeProgress);
+
+                element.textContent = current.toLocaleString();
+
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                }
+            }
+
+            requestAnimationFrame(update);
+        }
+
+        // Event listeners
+        document.querySelectorAll('.filter-select').forEach(select => {
+            select.addEventListener('change', updateVisualization);
+        });
+
+        document.getElementById('ctaButton').addEventListener('click', () => {
+            const poolSize = calculatePool();
+            alert(`Your curated pool: ${poolSize.toLocaleString()} potential matches.\n\nProfile submission coming soon.`);
+        });
+
+        window.addEventListener('resize', () => {
+            resizeCanvas();
+            updateVisualization();
+        });
+
+        // Initialize
+        resizeCanvas();
+        updateVisualization();
+    </script>
+</body>
+</html>
