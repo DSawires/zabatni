@@ -297,20 +297,24 @@
         /* Responsive */
         @media (max-width: 1024px) {
             html, body {
-                overflow: auto;
-                height: auto;
+                height: 100%;
+                overflow: hidden;
             }
 
             .container {
                 grid-template-columns: 1fr;
-                grid-template-rows: 50vh auto;
-                height: auto;
-                min-height: 100vh;
+                grid-template-rows: 45vh 55vh;
+                height: 100vh;
+            }
+
+            .viz-panel {
+                min-height: 0;
             }
 
             .content-panel {
                 padding: 32px;
-                overflow: visible;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
             }
 
             .headline {
@@ -320,7 +324,7 @@
 
         @media (max-width: 640px) {
             .container {
-                grid-template-rows: 40vh auto;
+                grid-template-rows: 35vh 65vh;
             }
 
             .content-panel {
@@ -333,6 +337,14 @@
 
             .filter-row {
                 grid-template-columns: 1fr;
+            }
+
+            .content-header {
+                margin-bottom: 24px;
+            }
+
+            .filter-group {
+                margin-bottom: 16px;
             }
         }
     </style>
